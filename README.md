@@ -15,8 +15,10 @@ npm run watch
 ```
 
 ### 生产模式
+```
 npm run build
 新建脚本在头部添加vue、vuex依赖
 // @require      https://unpkg.com/vue@3.1.1/dist/vue.global.js
 // @require      https://unpkg.com/vuex@4.0.0/dist/vuex.global.js
 将dist/js/app.js里面的代码粘贴致“your code”处即可
+```
