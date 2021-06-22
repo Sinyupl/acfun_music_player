@@ -8,7 +8,8 @@ npm install
 ### 开发模式下
 ```
 npm run watch
-并在tampermonkey新建脚本，头部下面添加如下，
+并在tampermonkey新建脚本，头部下面添加如下（chrome下的tampermonkey需要勾选
+“允许访问文件网址”）
 // @require      file://（你的文件夹）/dist/js/chunk-vendors.js
 // @require      file://（你的文件夹）/dist/js/app.js
 ```
