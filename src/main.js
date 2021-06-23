@@ -57,7 +57,6 @@ if (href.indexOf('/v/' !== -1) && href.indexOf('#innerPlayer') !== -1) {
             }
             video.addEventListener('ended', () => {
                 playPart(playIndex)
-                playIndex++
             })
             video.addEventListener('timeupdate', () => {
                 window.parent.updateCurrentTime(video.currentTime)
@@ -94,14 +93,15 @@ if (href.indexOf('/v/' !== -1) && href.indexOf('#innerPlayer') !== -1) {
         }
     }, 400)
     const playPart = (index) => {
+        playIndex = index + 1
         const scrollDiv = document.querySelector('.scroll-div')
         if (scrollDiv && scrollDiv.querySelectorAll('li').length > index) {
             scrollDiv.querySelectorAll('li')[index].click()
-            setTimeout(() => {
+            video.addEventListener('canplay', ()=> {
                 video.play()
                 window.parent.updatePartIndex(index)
                 window.parent.setDuration(video.duration)
-            }, 500)
+            })
         } else {
             window.parent.autoPlayNext()
         }

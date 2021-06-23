@@ -171,10 +171,11 @@ export default {
               continue
             }
             if (item.channelInfo.channelId === 207) {
-              const reg = /原唱|编曲|翻唱|作曲|曲绘/g
+              const reg = /原唱|编曲|翻唱|作曲|曲绘|混音|歌回/g
               if (
                 (item.contentDesc && item.contentDesc.match(reg) !== null) ||
-                item.userId === 3473754
+                item.userId === 3473754 ||
+                (item.contentTitle && item.contentTitle.match(reg) !== null)
               ) {
                 this.likeList.push(item)
                 continue

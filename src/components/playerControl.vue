@@ -58,7 +58,7 @@
         >
         <a
           target="_blank"
-          v-if="curentSong && !currentSong.userName "
+          v-if="currentSong && !currentSong.userName && currentSong.user"
           :href="'https://www.acfun.cn/u/' + currentSong.user.userId"
           >{{ currentSong.user.userName }}</a
         >
@@ -520,7 +520,8 @@ export default {
 
         span {
           display: block;
-          width: 24px;
+          width: 22px;
+          padding: 0 2px;
           height: 16px;
           line-height: 16px;
           text-align: center;
