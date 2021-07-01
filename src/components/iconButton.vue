@@ -56,13 +56,13 @@ export default {
 
 @keyframes playing {
   0% {
-    box-shadow: 0 0 1px #800000;
+    box-shadow: 0 0 1px #339999;
   }
   50% {
-    box-shadow: 0 0 15px #800000;
+    box-shadow: 0 0 15px #339999;
   }
   100% {
-    box-shadow: 0 0 1px #800000;
+    box-shadow: 0 0 1px #339999;
   }
 }
 @keyframes loop {

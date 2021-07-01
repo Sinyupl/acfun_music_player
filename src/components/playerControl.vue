@@ -7,14 +7,6 @@
     :class="{ active: showVideo }"
     ref="video"
   ></iframe>
-  <iframe
-    v-if="currentSong.contentId"
-    :src="
-      'https://api-new.app.acfun.cn/rest/app/douga/info?dougaId=' +
-      currentSong.contentId
-    "
-    hidden
-  ></iframe>
   <div class="player_container" v-show="showControl">
     <div class="song_info">
       <div class="cover">
@@ -436,13 +428,15 @@ export default {
 <style lang="scss" scoped>
 .video_player {
   position: fixed;
-  bottom: -600px;
+  bottom: -563px;
   left: 0px;
   width: 1000px;
-  height: 600px;
+  height: 563px;
   z-index: 10;
   transition: all 0.2s;
+  visibility: hidden;
   &.active {
+    visibility: visible;
     bottom: 120px;
   }
 }
@@ -458,7 +452,7 @@ export default {
   padding: 50px;
   align-items: center;
   justify-content: center;
-  background: #800000;
+  background: rgba($color: #99CCCC, $alpha: 1);
   .song_info {
     display: flex;
     align-items: center;
@@ -531,7 +525,7 @@ export default {
           cursor: pointer;
           margin-right: 10px;
           &.active {
-            color: #800000;
+            color: #669999;
             background: #fff;
           }
         }
@@ -632,7 +626,7 @@ export default {
 /*横条样式*/
 input[type='range'] {
   -webkit-appearance: none; /*清除系统默认样式*/
-  background: -webkit-linear-gradient(135deg, #c71585, #f08080) no-repeat, #ddd; /*设置左边颜色为#61bd12，右边颜色为#ddd*/
+  background: -webkit-linear-gradient(135deg, #fff, #fff) no-repeat, #ddd; /*设置左边颜色为#61bd12，右边颜色为#ddd*/
   background-size: 100% 100%; /*设置左右宽度比例*/
   height: 3px; /*横条的高度*/
 }
@@ -656,7 +650,7 @@ input[type=range]::-moz-range-thumb {
   height: 4px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #b22222;
+  background: #009999;
   border-radius: 2px;
   height: 4px;
 }

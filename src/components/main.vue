@@ -15,7 +15,7 @@
 <script>
 import playerCtrl from './playerControl'
 import list from './list'
-import {minify} from '../assets/svg'
+import { minify } from '../assets/svg'
 export default {
   components: {
     playerCtrl,
@@ -41,7 +41,7 @@ export default {
     },
     hideMain() {
       this.$emit('hideMain')
-    }
+    },
   },
 }
 </script>
@@ -53,7 +53,12 @@ export default {
   top: 0;
   left: 0;
   z-index: 10;
-  background-image: linear-gradient(45deg, #800000, #ff6347);
+  background-image: linear-gradient(
+    45deg,
+    #CCFFCC,
+    #CCFFFF,
+    #FFFFCC,
+  );
   background-size: 400% 400%;
   background-position: 0% 0%;
   background-repeat: no-repeat;

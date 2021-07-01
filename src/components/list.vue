@@ -36,6 +36,15 @@
       >
         关注
       </div>
+      <div
+        class="tab user"
+        
+        :class="{ active: currentListIndex === 5 }"
+        v-show="storageUserName"
+      >
+        <span class="name" @click="selectPage(5)"> {{ storageUserName }}</span>
+        <span class="close" @click="clearStorage">×</span>
+      </div>
     </div>
     <div class="play_list_button" @click="playList">播放列表</div>
     <div class="list_content" v-if="[0, 1, 2].indexOf(currentListIndex) !== -1">
@@ -90,6 +99,22 @@
         <span>{{ item.caption }}</span>
       </div>
     </div>
+    <div class="list_content" v-if="currentListIndex === 5">
+      <div
+        class="rank_item"
+        v-for="(item, index) in storageList"
+        :key="item.contentId"
+        @dblclick="selectItem(index)"
+        :class="{
+          active:
+            currentSongIndex === index &&
+            selectedListIndex === currentListIndex,
+        }"
+      >
+        <span>{{ item.time }}</span>
+        <span>{{ item.title }}</span>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -104,6 +129,10 @@ export default {
       pushList: [],
       currentSongIndex: null, // 当前歌曲索引
       cancelFavorite: cancelFavorite, // 取消收藏按钮
+      storageUserName: null, // 个人播放列表的用户名称
+      storageList: [], // 个人播放列表
+      storageUid: null,
+      storageJson: null
     }
   },
   emits: ['selectItem'],
@@ -111,8 +140,43 @@ export default {
     this.selectPage(0)
     this.getFavorite()
     this.getPushList()
+    if (localStorage.acfunMusicJson) {
+      this.storageJson = JSON.parse(localStorage.acfunMusicJson)
+    }
+    window.addEventListener('storage', () => {
+      this.storageJson = JSON.parse(localStorage.acfunMusicJson)
+    })
+  },
+  watch: {
+    storageJson() {
+      this.initStorage()
+    }
   },
   methods: {
+    // 初始化缓存
+    initStorage() {
+      if (localStorage.acfunMusicJson) {
+        const data = JSON.parse(localStorage.acfunMusicJson)
+        if (this.storageUserName === data.name) {
+          return
+        }
+        this.storageUserName = data.name
+        this.storageList = data.list
+        this.storageUid = data.uid
+        if (this.currentListIndex === 5) {
+          this.currentSongIndex = null
+        }
+      }
+    },
+    clearStorage() {
+      localStorage.removeItem('acfunMusicJson')
+      this.storageUserName = null
+      this.storageList = []
+      this.storageUid = null
+      if (this.currentListIndex === 5) {
+        this.selectPage(0)
+      }
+    },
     selectPage(index) {
       this.currentListIndex = index
       const url =
@@ -142,8 +206,17 @@ export default {
         this.$emit('selectItem', this.rankList, index)
       } else if (this.currentListIndex === 3) {
         this.$emit('selectItem', this.likeList, index)
-      } else {
+      } else if (this.currentListIndex === 4) {
         this.$emit('selectItem', this.pushList, index)
+      } else if (this.currentListIndex === 5) {
+        const list = this.storageList.map((item) => {
+          return {
+            ...item,
+            userName: this.storageUserName,
+            userId: this.storageUid,
+          }
+        })
+        this.$emit('selectItem', list, index)
       }
     },
     playList() {
@@ -171,7 +244,7 @@ export default {
               continue
             }
             if (item.channelInfo.channelId === 207) {
-              const reg = /原唱|编曲|翻唱|作曲|曲绘|混音|歌回/g
+              const reg = /唱|编曲|作曲|曲绘|混音|歌回|cover/g
               if (
                 (item.contentDesc && item.contentDesc.match(reg) !== null) ||
                 item.userId === 3473754 ||
@@ -199,31 +272,6 @@ export default {
           }
         })
     },
-    getMusicList(list) {
-      let _list = []
-      for (let item of list) {
-        if (
-          [103, 136, 137, 139, 185, 215].indexOf(item.channelInfo.channelId) !==
-            -1 ||
-          [103, 136, 137, 139, 185, 215].indexOf(item.channel.id) !== -1
-        ) {
-          _list.push(item)
-          continue
-        }
-        if (item.channelInfo.channelId === 207 || item.channel.id === 207) {
-          const reg = /原唱|编曲|翻唱|作曲|曲绘/g
-          if (
-            (item.contentDesc && item.contentDesc.match(reg) !== null) ||
-            item.userId === 3473754 ||
-            (item.caption && item.caption.match(reg))
-          ) {
-            _list.push(item)
-            continue
-          }
-        }
-      }
-      return _list
-    },
     unFavorite(index) {
       fetch('/rest/pc-direct/unFavorite', {
         method: 'post',
@@ -248,7 +296,7 @@ export default {
   height: 100%;
 }
 .tabs {
-  width: 400px;
+  width: 600px;
   margin: 0 auto;
   margin-top: 40px;
   display: flex;
@@ -256,15 +304,39 @@ export default {
   align-items: center;
   .tab {
     flex: 1;
-    color: #ffe4e1;
+    color: #339999;
     box-sizing: border-box;
     height: 35px;
     line-height: 35px;
     text-align: center;
     font-size: 16px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &.user{
+      flex: 2
+    }
     &.active {
-      border-bottom: 2px solid #ffe4e1;
+      border-bottom: 2px solid #339999;
+    }
+    .name {
+      width: calc(100% - 20px);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      display: inline-block;
+    }
+    .close {
+      transform: translateX(10%);
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: rgba($color: #dfdfdf, $alpha: 0.8);
+      align-self: center;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
     }
   }
 }
@@ -272,11 +344,12 @@ export default {
   height: 35px;
   line-height: 35px;
   text-align: center;
-  color: #fff;
-  border: 1px solid #fff;
+  color: #339999;
+  border: 1px solid #339999;
   border-radius: 18px;
   margin: 2px 0;
   margin-left: 15px;
+  margin-top: 10px;
   width: 120px;
   cursor: pointer;
 }
@@ -290,15 +363,27 @@ export default {
     height: 45px;
     align-items: center;
     font-size: 15px;
-    color: #fff;
+    color: #339999;
     user-select: none;
     padding-left: 20px;
     border-radius: 23px;
     &.active {
-      background: rgba(255, 255, 255, 0.3);
+      position: relative;
+      color: #0099cc;
+      &::before {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: 16px;
+        display: block;
+        width: 0;
+        height: 0;
+        border: 6px solid transparent;
+        border-left: 6px solid #0099cc;
+      }
     }
     &:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba($color: #fff, $alpha: 0.2);
       .icon_container {
         display: flex;
       }
@@ -308,7 +393,8 @@ export default {
         margin-right: 5px;
         padding: 2px 4px;
         border-radius: 3px;
-        background: #dc143c;
+        background: #99cccc;
+        color: #fff;
       }
       &:last-of-type {
         max-width: 65%;
@@ -329,7 +415,7 @@ export default {
       }
       .confirm {
         font-size: 12px;
-        color: #dc143c;
+        color: #339999;
         cursor: pointer;
         margin-left: 5px;
         background: #fff;
@@ -356,7 +442,7 @@ export default {
   width: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #b22222;
+  background: #339999;
   border-radius: 3px;
   width: 6px;
 }
